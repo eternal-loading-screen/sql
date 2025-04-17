@@ -12,7 +12,11 @@ product_id
 THEN 'No more Fridge Space'
 ElSE 'We have space'
 END as Fridge_Capacity_Indicator
-
+-- The 2nd Case when for fun
+,CASE WHEN vendor.vendor_name is null
+THEN 'No Vendor name available'
+ElSE 'Has Vendor Name'
+END as Vendor_Name_Indicator
 FROM
 customer_purchases
 
