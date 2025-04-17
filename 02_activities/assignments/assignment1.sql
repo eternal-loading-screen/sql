@@ -146,6 +146,7 @@ LEFT JOIN customer c
 ON c.customer_id = 
 cust_p.customer_id
 
+-- Picked this up from work
 GROUP BY 1,2,3,4
 HAVING Paid >= 2000
 
