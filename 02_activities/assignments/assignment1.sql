@@ -177,7 +177,8 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 
--- Teno table: https://github.com/UofT-DSI/sql/blob/main/01_materials/slides/slides_03.pdf   - Page 30
+-- Temp table slides: https://github.com/UofT-DSI/sql/blob/main/01_materials/slides/slides_03.pdf   - Page 30
+-- Apr 17th class
 
 
 CREATE TABLE temp.new_vendor (
@@ -220,11 +221,15 @@ but remember, STRFTIME returns a STRING for your WHERE statement!! */
 
 SELECT 
 customer_id
+-- adding in a day field (wasn't asked)
 , strftime('%d', market_date ) as market_day
+-- adding in a month field
 , strftime('%m', market_date ) as market_month
+-- adding in a year field	
 , strftime('%Y', market_date ) as market_year
 , market_date
---,(quantity * cost_to_customer_per_qty) as price
+--,(quantity * cost_to_customer_per_qty) as price 
+-- assuming this what you looking for the amount of money spent	
 ,SUM (quantity * cost_to_customer_per_qty) as Paid
 FROM 
 customer_purchases
