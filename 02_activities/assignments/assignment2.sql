@@ -20,6 +20,11 @@ The `||` values concatenate the columns into strings.
 Edit the appropriate columns -- you're making two edits -- and the NULL rows will be fixed. 
 All the other rows will remain the same.) */
 
+-- But does not use COALESCE
+SELECT 
+product_name || ', ' || product_size|| ' (' || product_qty_type || ')' as details
+FROM product
+WHERE details is not null
 
 
 --Windowed Functions
