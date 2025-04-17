@@ -132,13 +132,14 @@ cust_p.customer_id
 ,customer_first_name
 ,CONCAT(customer_first_name  , ' ', customer_last_name) as Customer_full_name
 ,(quantity * cost_to_customer_per_qty) as price
+,SUM (quantity * cost_to_customer_per_qty) as Paid
 FROM customer_purchases as cust_p
 LEFT JOIN customer c
 ON c.customer_id = 
 cust_p.customer_id
 
 GROUP BY 1,2,3,4
-HAVING price >= 2000
+HAVING Paid >= 2000
 
 ORDER BY customer_last_name
 ,customer_first_name
@@ -168,7 +169,12 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 
-SELECT 
+CREATE TABLE temp.new_vendor (
+SELECT *
+FROM 
+vendor )
+
+as temp.new_vendor
 
 
 
@@ -178,6 +184,14 @@ SELECT
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! */
 
+SELECT 
+customer_id
+, strftime('%d', market_date ) as market_day
+, strftime('%m', market_date ) as market_month
+, strftime('%Y', market_date ) as market_year
+, market_date
+FROM 
+customer_purchases
 
 
 /* 2. Using the previous query as a base, determine how much money each customer spent in April 2022. 
@@ -186,3 +200,28 @@ Remember that money spent is quantity*cost_to_customer_per_qty.
 HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement!! */
 
+
+SELECT 
+customer_id
+, strftime('%d', market_date ) as market_day
+, strftime('%m', market_date ) as market_month
+, strftime('%Y', market_date ) as market_year
+, market_date
+--,(quantity * cost_to_customer_per_qty) as price
+,SUM (quantity * cost_to_customer_per_qty) as Paid
+FROM 
+customer_purchases
+
+WHERE 
+
+strftime('%Y', market_date ) = '2022'
+AND 
+strftime('%m', market_date ) = '04'
+GROUP BY 
+1, 2, 3, 4
+
+/* can also filter with
+market_date >= '2022-04-01'
+and 
+market_date <= '2022-04-30'
+*/
