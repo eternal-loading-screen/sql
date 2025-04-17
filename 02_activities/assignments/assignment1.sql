@@ -68,7 +68,7 @@ if the product_qty_type is “unit,” and otherwise displays the word “bulk.�
 SELECT
 product_id 
 ,product_name
-CASE WHEN product_qty_type = 'unit'
+,CASE WHEN product_qty_type = 'unit'
 THEN 'unit'
 ElSE 'bulk' END AS prod_qty_type_condensed
 FROM
