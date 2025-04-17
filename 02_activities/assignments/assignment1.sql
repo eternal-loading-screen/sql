@@ -86,7 +86,7 @@ ElSE 'bulk' END AS prod_qty_type_condensed
 THEN 1
 ElSE 0 END AS pepper_flag
 FROM
-product
+product;
 
 
 
@@ -102,7 +102,7 @@ ON
 vendor_booth_assignments.vendor_id
 = vendor.vendor_id
 ORDER BY 
-vendor.vendor_name, market_date ASC
+vendor.vendor_name, market_date ASC ;
 
 
 /* SECTION 3 */
@@ -132,6 +132,7 @@ cust_p.customer_id
 ,customer_first_name
 ,CONCAT(customer_first_name  , ' ', customer_last_name) as Customer_full_name
 ,(quantity * cost_to_customer_per_qty) as price
+-- Assuming the question is trying to ask us to aggregate the price field
 ,SUM (quantity * cost_to_customer_per_qty) as Paid
 FROM customer_purchases as cust_p
 LEFT JOIN customer c
@@ -142,7 +143,7 @@ GROUP BY 1,2,3,4
 HAVING Paid >= 2000
 
 ORDER BY customer_last_name
-,customer_first_name
+,customer_first_name ;
 /*
 Can also do this
 
@@ -169,6 +170,9 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 
+-- Teno table: https://github.com/UofT-DSI/sql/blob/main/01_materials/slides/slides_03.pdf   - Page 30
+
+
 CREATE TABLE temp.new_vendor (
 SELECT *
 FROM 
@@ -191,7 +195,7 @@ customer_id
 , strftime('%Y', market_date ) as market_year
 , market_date
 FROM 
-customer_purchases
+customer_purchases ;
 
 
 /* 2. Using the previous query as a base, determine how much money each customer spent in April 2022. 
@@ -218,7 +222,7 @@ strftime('%Y', market_date ) = '2022'
 AND 
 strftime('%m', market_date ) = '04'
 GROUP BY 
-1, 2, 3, 4
+1, 2, 3, 4 ;
 
 /* can also filter with
 market_date >= '2022-04-01'
