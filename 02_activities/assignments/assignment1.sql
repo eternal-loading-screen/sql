@@ -11,11 +11,15 @@ customer;
 
 /* 2. Write a query that displays all of the columns and 10 rows from the cus- tomer table, 
 sorted by customer_last_name, then customer_first_ name. */
+-- TOP 10 - Also an option
+
 SELECT *
 FROM customer
 ORDER BY 
 -- Assuming you want it to sort alphabetically
 customer_last_name, customer_first_name ASC;
+
+LIMIT 10
 
 --WHERE
 /* 1. Write a query that returns all customer purchases of product IDs 4 and 9. */
@@ -82,6 +86,7 @@ product_id
 ,CASE WHEN product_qty_type = 'unit'
 THEN 'unit'
 ElSE 'bulk' END AS prod_qty_type_condensed
+-- Pepper indicator
 ,CASE WHEN product_name LIKE '%pepper%'
 THEN 1
 ElSE 0 END AS pepper_flag
@@ -101,6 +106,7 @@ vendor
 ON
 vendor_booth_assignments.vendor_id
 = vendor.vendor_id
+-- sort is applied here
 ORDER BY 
 vendor.vendor_name, market_date ASC ;
 
@@ -116,7 +122,7 @@ vendor_id
 ,Count( vendor_id ) as rent_count
 
 FROM vendor_booth_assignments
-GROUP BY vendor_id
+GROUP BY vendor_id ; 
 
 
 /* 2. The Farmer’s Market Customer Appreciation Committee wants to give a bumper 
@@ -180,6 +186,7 @@ vendor )
 
 as temp.new_vendor
 
+INSERT 
 
 
 -- Date
