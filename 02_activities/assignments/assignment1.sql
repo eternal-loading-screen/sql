@@ -180,9 +180,14 @@ VALUES(col1,col2,col3,col4,col5)
 
 
 CREATE TABLE temp.new_vendor (
-SELECT *
+SELECT 
+vendor_id
+,vendor_name
+,vendor_type
+,vendor_owner_first_name
+,vendor_owner_last_name
 FROM 
-vendor )
+vendor  )
 
 as temp.new_vendor
 
