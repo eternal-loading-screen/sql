@@ -2,6 +2,7 @@
 /* SECTION 2 */
 -----  Here are the requirements
 -- https://github.com/UofT-DSI/sql/blob/main/02_activities/assignments/Assignment1.md
+-- https://github.com/UofT-DSI/sql/blob/main/02_activities/assignments/Assignment1_rubric.md
 
 --SELECT
 /* 1. Write a query that returns everything in the customer table. */
