@@ -25,6 +25,8 @@ LIMIT 10
 --WHERE
 /* 1. Write a query that returns all customer purchases of product IDs 4 and 9. */
 -- option 1
+-- Also apparently there aren't any records with product ID = 9
+
 SELECT *
 FROM customer_purchases as cust_p
 WHERE product_id = 4
@@ -203,7 +205,8 @@ AS
 -- Niyaz did a similar example during after class office hours
 -- Thanks again Niyaz
 INSERT INTO 
-temp.new_vendor (    vendor_id
+temp.new_vendor (    
+     vendor_id
     ,vendor_name
     ,vendor_type
     ,vendor_owner_first_name
