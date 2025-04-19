@@ -103,6 +103,7 @@ vendor_id field they both have in common, and sorts the result by vendor_name, t
 
 SELECT *
 FROM vendor_booth_assignments
+-- I know you can give the table names an alias or abbreviated name
 INNER JOIN 
 vendor
 ON
