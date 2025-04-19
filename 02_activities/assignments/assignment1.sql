@@ -220,6 +220,8 @@ VALUES(10, "Thomas's Superfood Store"
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! */
 
+-- I believe Thomas said this part was optional	
+
 SELECT 
 customer_id
 , strftime('%d', market_date ) as market_day
@@ -245,6 +247,7 @@ customer_id
 , strftime('%m', market_date ) as market_month
 -- adding in a year field	
 , strftime('%Y', market_date ) as market_year
+-- Normally would use YEAR() in MS SQL
 , market_date
 --,(quantity * cost_to_customer_per_qty) as price 
 -- assuming this what you looking for the amount of money spent	
