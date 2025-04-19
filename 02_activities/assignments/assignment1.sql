@@ -62,7 +62,6 @@ WHERE
 vendor_id BETWEEN 8 and 10;
 
 
-
 --CASE
 /* 1. Products can be sold by the individual unit or by bulk measures like lbs. or oz. 
 Using the product table, write a query that outputs the product_id and product_name
@@ -214,7 +213,7 @@ temp.new_vendor (
 -- Assuming you want the ID to be 10; otherwise it can be another
 -- random number
 VALUES(10, "Thomas's Superfood Store"
-, 'Fresh Focused store' , 'Thomas' , 'Rosenthal')
+, 'Fresh Focused store' , 'Thomas' , 'Rosenthal') ;
 
 
 -- Date
