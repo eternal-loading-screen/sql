@@ -213,7 +213,7 @@ temp.new_vendor (
 -- Assuming you want the ID to be 10; otherwise it can be another
 -- random number
 VALUES(10, "Thomas's Superfood Store"
-, 'Fresh Focused store' , 'Thomas' , 'Rosenthal') ;
+, 'Fresh Focused' , 'Thomas' , 'Rosenthal') ;
 
 
 -- Date
