@@ -181,20 +181,37 @@ VALUES(col1,col2,col3,col4,col5)
 -- Temp table slides: https://github.com/UofT-DSI/sql/blob/main/01_materials/slides/slides_03.pdf   - Page 30
 -- Apr 17th class
 
+-- Removes table is it already exists
+-- If not removed, then it will cause an error
+DROP TABLE IF EXISTS temp.new_vendor;
 
-CREATE TABLE temp.new_vendor (
-SELECT 
-vendor_id
-,vendor_name
-,vendor_type
-,vendor_owner_first_name
-,vendor_owner_last_name
-FROM 
-vendor  )
+-- Create the temp table
+CREATE TEMP TABLE temp.new_vendor
+AS 
+-- best to state the columns and their order
+( 
+    SELECT 
+    vendor_id
+    ,vendor_name
+    ,vendor_type
+    ,vendor_owner_first_name
+    ,vendor_owner_last_name
+    FROM 
+    vendor  
+)
 
-as temp.new_vendor
-
-INSERT 
+-- Niyaz did a similar example during after class office hours
+-- Thanks again Niyaz
+INSERT INTO 
+temp.new_vendor (    vendor_id
+    ,vendor_name
+    ,vendor_type
+    ,vendor_owner_first_name
+    ,vendor_owner_last_name)
+-- Assuming you want the ID to be 10; otherwise it can be another
+-- random number
+VALUES(10, "Thomas's Superfood Store"
+, 'Fresh Focused store' , 'Thomas' , 'Rosenthal')
 
 
 -- Date
@@ -219,7 +236,7 @@ Remember that money spent is quantity*cost_to_customer_per_qty.
 HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement!! */
 
-
+-- had to google this for the answer
 SELECT 
 customer_id
 -- adding in a day field (wasn't asked)
