@@ -26,6 +26,11 @@ product_name || ', ' || product_size|| ' (' || product_qty_type || ')' as detail
 FROM product
 WHERE details is not null
 
+-- Using COALESCE
+SELECT 
+ COALESCE( product_name || ', ' || product_size|| ' (' || product_qty_type || ')' ) as details
+FROM product
+
 
 --Windowed Functions
 /* 1. Write a query that selects from the customer_purchases table and numbers each customer’s  
@@ -37,17 +42,39 @@ each new market date for each customer, or select only the unique market dates p
 (without purchase details) and number those visits. 
 HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK(). */
 
+SELECT *
+,ROW_NUMBER() OVER( PARTITION BY  customer_id, market_date
+ ORDER BY market_date ASC ) 
+FROM 
+customer_purchases
+
 
 
 /* 2. Reverse the numbering of the query from a part so each customer’s most recent visit is labeled 1, 
 then write another query that uses this one as a subquery (or temp table) and filters the results to 
 only the customer’s most recent visit. */
 
+-- Drop table if the code has already been run
+DROP TABLE IF EXISTS temp.customer_visits;
+
+-- Create the temp table
+CREATE TEMP TABLE temp.customer_visits
+AS 
+
+(
+SELECT *
+,ROW_NUMBER() OVER( PARTITION BY  customer_id, market_date
+ ORDER BY market_date DESC ) 
+FROM 
+customer_purchases
+)
 
 
 /* 3. Using a COUNT() window function, include a value along with each row of the 
 customer_purchases table that indicates how many different times that customer has purchased that product_id. */
 
+SELECT *
+FROM 
 
 
 -- String manipulations
@@ -61,6 +88,12 @@ Remove any trailing or leading whitespaces. Don't just use a case statement for 
 | Habanero Peppers - Organic | Organic     |
 
 Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR will help split the column. */
+
+SELECT *
+,SUBSTR () as updated_product_name
+FROM product
+
+
 
 
 
@@ -132,7 +165,3 @@ Third, SET current_quantity = (...your select statement...), remembering that WH
 Finally, make sure you have a WHERE statement to update the right row, 
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
-
-
-
-
