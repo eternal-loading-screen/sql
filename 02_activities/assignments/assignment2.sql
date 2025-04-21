@@ -43,8 +43,8 @@ each new market date for each customer, or select only the unique market dates p
 HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK(). */
 
 SELECT *
-,ROW_NUMBER() OVER( PARTITION BY  customer_id, market_date
- ORDER BY market_date ASC ) 
+,ROW_NUMBER() OVER( PARTITION BY  market_date, customer_id 
+ORDER BY market_date ASC ) 
 FROM 
 customer_purchases
 
@@ -54,17 +54,11 @@ customer_purchases
 then write another query that uses this one as a subquery (or temp table) and filters the results to 
 only the customer’s most recent visit. */
 
--- Drop table if the code has already been run
-DROP TABLE IF EXISTS temp.customer_visits;
-
--- Create the temp table
-CREATE TEMP TABLE temp.customer_visits
-AS 
 
 (
 SELECT *
 ,ROW_NUMBER() OVER( PARTITION BY  customer_id, market_date
- ORDER BY market_date DESC ) 
+ORDER BY market_date DESC ) 
 FROM 
 customer_purchases
 )
@@ -75,7 +69,7 @@ customer_purchases table that indicates how many different times that customer h
 
 SELECT *
 FROM 
-
+customer_purchases
 
 -- String manipulations
 /* 1. Some product names in the product table have descriptions like "Jar" or "Organic". 
@@ -112,6 +106,25 @@ HINT: There are a possibly a few ways to do this query, but if you're struggling
 with a UNION binding them. */
 
 
+-- Create a temp table
+-- Drop table if the code has already been run
+DROP TABLE IF EXISTS temp.daily_sales
+DROP TABLE IF EXISTS temp.max_sales
+DROP TABLE IF EXISTS temp.min_sales;
+
+-- Create the temp table
+CREATE TEMP TABLE temp.daily_sales
+AS 
+(
+SELECT
+market_date
+,SUM (quantity * cost_to_customer_per_qty) as Sales
+FROM 
+customer_purchases
+GROUP BY 1
+)
+
+
 
 
 /* SECTION 3 */
@@ -127,7 +140,9 @@ Think a bit about the row counts: how many distinct vendors, product names are t
 How many customers are there (y). 
 Before your final group by you should have the product of those two queries (x*y).  */
 
-
+SELECT *
+FROM 
+vendor_inventory
 
 -- INSERT
 /*1.  Create a new table "product_units". 
@@ -135,7 +150,13 @@ This table will contain only products where the `product_qty_type = 'unit'`.
 It should use all of the columns from the product table, as well as a new column for the `CURRENT_TIMESTAMP`.  
 Name the timestamp column `snapshot_timestamp`. */
 
-
+INSERT INTO 
+product_units as (
+SELECT *
+, now() as snapshot_timestamp
+FROM product 
+WHERE 
+product_qty_type = 'unit')
 
 /*2. Using `INSERT`, add a new row to the product_units table (with an updated timestamp). 
 This can be any product you desire (e.g. add another record for Apple Pie). */
