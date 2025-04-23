@@ -1,4 +1,8 @@
 /* ASSIGNMENT 2 */
+-- https://github.com/eternal-loading-screen/sql/blob/assignment-one/02_activities/assignments/Assignment2.md
+
+-- https://github.com/eternal-loading-screen/sql/blob/assignment-one/01_materials/slides/slides_04.pdf
+
 /* SECTION 2 */
 
 -- COALESCE
@@ -20,6 +24,16 @@ The `||` values concatenate the columns into strings.
 Edit the appropriate columns -- you're making two edits -- and the NULL rows will be fixed. 
 All the other rows will remain the same.) */
 
+-- But does not use COALESCE
+SELECT 
+product_name || ', ' || product_size|| ' (' || product_qty_type || ')' as details
+FROM product
+WHERE details is not null
+
+-- Using COALESCE
+SELECT 
+ COALESCE( (product_name || ', ' || product_size|| ' (' || product_qty_type || ')' ), 'Missing data') as details
+FROM product
 
 
 --Windowed Functions
@@ -32,6 +46,12 @@ each new market date for each customer, or select only the unique market dates p
 (without purchase details) and number those visits. 
 HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK(). */
 
+SELECT *
+,ROW_NUMBER() OVER( PARTITION BY  market_date, customer_id 
+ORDER BY market_date ASC ) 
+FROM 
+customer_purchases
+
 
 
 /* 2. Reverse the numbering of the query from a part so each customer’s most recent visit is labeled 1, 
@@ -39,11 +59,22 @@ then write another query that uses this one as a subquery (or temp table) and fi
 only the customer’s most recent visit. */
 
 
+(
+SELECT *
+,ROW_NUMBER() OVER( PARTITION BY  customer_id, market_date
+ORDER BY market_date DESC ) 
+FROM 
+customer_purchases
+)
+
 
 /* 3. Using a COUNT() window function, include a value along with each row of the 
 customer_purchases table that indicates how many different times that customer has purchased that product_id. */
 
-
+SELECT *
+,count(customer_id , product_id) as Counter
+FROM 
+customer_purchases
 
 -- String manipulations
 /* 1. Some product names in the product table have descriptions like "Jar" or "Organic". 
@@ -56,6 +87,16 @@ Remove any trailing or leading whitespaces. Don't just use a case statement for 
 | Habanero Peppers - Organic | Organic     |
 
 Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR will help split the column. */
+
+SELECT *
+-- find the position of hyphen
+,INSTR(product_name,'-') 
+-- get string
+,SUBSTR ( product_name , 1, 
+    INSTR(product_name,'-') ) as updated_product_name
+FROM product
+
+
 
 
 
@@ -74,6 +115,25 @@ HINT: There are a possibly a few ways to do this query, but if you're struggling
 with a UNION binding them. */
 
 
+-- Create a temp table
+-- Drop table if the code has already been run
+DROP TABLE IF EXISTS temp.daily_sales
+DROP TABLE IF EXISTS temp.max_sales
+DROP TABLE IF EXISTS temp.min_sales;
+
+-- Create the temp table
+CREATE TEMP TABLE temp.daily_sales
+AS 
+(
+SELECT
+market_date
+,SUM (quantity * cost_to_customer_per_qty) as Sales
+FROM 
+customer_purchases
+GROUP BY 1
+)
+
+
 
 
 /* SECTION 3 */
@@ -89,7 +149,9 @@ Think a bit about the row counts: how many distinct vendors, product names are t
 How many customers are there (y). 
 Before your final group by you should have the product of those two queries (x*y).  */
 
-
+SELECT *
+FROM 
+vendor_inventory
 
 -- INSERT
 /*1.  Create a new table "product_units". 
@@ -97,7 +159,14 @@ This table will contain only products where the `product_qty_type = 'unit'`.
 It should use all of the columns from the product table, as well as a new column for the `CURRENT_TIMESTAMP`.  
 Name the timestamp column `snapshot_timestamp`. */
 
-
+INSERT INTO 
+product_units as (
+SELECT *
+-- Gets the current time / when the code was run
+, now() as snapshot_timestamp
+FROM product 
+WHERE 
+product_qty_type = 'unit')
 
 /*2. Using `INSERT`, add a new row to the product_units table (with an updated timestamp). 
 This can be any product you desire (e.g. add another record for Apple Pie). */
@@ -127,7 +196,3 @@ Third, SET current_quantity = (...your select statement...), remembering that WH
 Finally, make sure you have a WHERE statement to update the right row, 
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
-
-
-
-
