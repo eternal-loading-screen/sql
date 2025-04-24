@@ -72,7 +72,7 @@ customer_purchases
 customer_purchases table that indicates how many different times that customer has purchased that product_id. */
 
 SELECT *
-,count(customer_id , product_id) as Counter
+,count(customer_id , product_id) OVER (PARTITION BY customer_id , product_id) as Count_Window
 FROM 
 customer_purchases
 
@@ -90,19 +90,36 @@ Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR w
 
 SELECT *
 -- find the position of hyphen
-,INSTR(product_name,'-') 
+,INSTR(product_name,'-') as hyphen_position
+,INSTR(UPPER(product_name),'ORGANIC') as organic_position
+,INSTR(UPPER(product_name),'jar') as jar_position
 -- get string
-,SUBSTR ( product_name , 1, 
-    INSTR(product_name,'-') ) as updated_product_name
-FROM product
-
-
-
+-- ,SUBSTR ( product_name , 1, 
+--     INSTR(product_name,'-') ) as product_name_to_hyphen
+-- ,SUBSTR ( product_name , -1, 
+--     INSTR(product_name,'-') ) as product_name_to_hyphen2
+-- ,SUBSTR ( product_name , -1, 
+--     INSTR(product_name,'-')+10 ) as product_name_to_hyphen3
+-- ,SUBSTR ( product_name , -1, 
+--     INSTR(product_name,'-')+10 ) as product_name_to_hyphen4       	
+-- ,SUBSTR ( product_name , 1, 
+--     INSTR(product_name,'-')+10 ) as product_name_to_hyphen5
+-- ,SUBSTR ( product_name , 
+--     INSTR(product_name,'-'),10 ) as product_name_to_hyphen6
+-- ,SUBSTR ( product_name , 
+--     INSTR(product_name,'-')+2,10 ) as product_name_to_hyphen7
+,CASE WHEN 	INSTR(product_name,'-') >1 then 
+	SUBSTR ( product_name , 
+		INSTR(product_name,'-')+2,10 )
+	else '' end as description	
+FROM product;
 
 
 /* 2. Filter the query to show any product_size value that contain a number with REGEXP. */
 
-
+SELECT *
+FROM product
+WHERE product_size REGEXP '[0-9]';
 
 -- UNION
 /* 1. Using a UNION, write a query that displays the market dates with the highest and lowest total sales.
@@ -149,9 +166,12 @@ Think a bit about the row counts: how many distinct vendors, product names are t
 How many customers are there (y). 
 Before your final group by you should have the product of those two queries (x*y).  */
 
-SELECT *
+SELECT product_id
+,customer_id
 FROM 
 vendor_inventory
+CROSS JOIN 
+customer;
 
 -- INSERT
 /*1.  Create a new table "product_units". 
@@ -196,3 +216,4 @@ Third, SET current_quantity = (...your select statement...), remembering that WH
 Finally, make sure you have a WHERE statement to update the right row, 
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
+
