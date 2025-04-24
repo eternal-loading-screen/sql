@@ -34,6 +34,8 @@ WHERE details is not null
 SELECT 
  COALESCE( (product_name || ', ' || product_size|| ' (' || product_qty_type || ')' ), 'Missing data') as details
 FROM product
+--Optional
+-- WHERE details <> 'Missing data'
 
 
 --Windowed Functions
@@ -48,9 +50,10 @@ HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK(). */
 
 SELECT *
 ,ROW_NUMBER() OVER( PARTITION BY  market_date, customer_id 
-ORDER BY market_date ASC ) 
+ORDER BY market_date , transaction_time ASC ) as counter
 FROM 
 customer_purchases
+
 
 
 
@@ -58,23 +61,32 @@ customer_purchases
 then write another query that uses this one as a subquery (or temp table) and filters the results to 
 only the customer’s most recent visit. */
 
-
-(
 SELECT *
-,ROW_NUMBER() OVER( PARTITION BY  customer_id, market_date
-ORDER BY market_date DESC ) 
 FROM 
-customer_purchases
+(
+    -- Subquery that sorts the data and applys a counter
+    SELECT *
+    ,ROW_NUMBER() OVER( PARTITION BY  customer_id, market_date
+    ORDER BY market_date , transaction_time DESC ) as counter
+    FROM 
+    customer_purchases
 )
-
+WHERE 
+counter = 1
 
 /* 3. Using a COUNT() window function, include a value along with each row of the 
 customer_purchases table that indicates how many different times that customer has purchased that product_id. */
 
 SELECT *
-,count(customer_id , product_id) OVER (PARTITION BY customer_id , product_id) as Count_Window
+,count(customer_id ) OVER (PARTITION BY customer_id , product_id) as Count_Window
 FROM 
 customer_purchases
+
+-- SELECT *
+-- ,count(customer_id , product_id) OVER (PARTITION BY customer_id , product_id) as Count_Window
+-- FROM 
+-- customer_purchases
+
 
 -- String manipulations
 /* 1. Some product names in the product table have descriptions like "Jar" or "Organic". 
@@ -92,7 +104,7 @@ SELECT *
 -- find the position of hyphen
 ,INSTR(product_name,'-') as hyphen_position
 ,INSTR(UPPER(product_name),'ORGANIC') as organic_position
-,INSTR(UPPER(product_name),'jar') as jar_position
+,INSTR(UPPER(product_name),'JAR') as jar_position
 -- get string
 -- ,SUBSTR ( product_name , 1, 
 --     INSTR(product_name,'-') ) as product_name_to_hyphen
@@ -166,12 +178,32 @@ Think a bit about the row counts: how many distinct vendors, product names are t
 How many customers are there (y). 
 Before your final group by you should have the product of those two queries (x*y).  */
 
+
+-- Unique # of Vendors
+SELECT 
+DISTINCT 
+ product_id
+ FROM 
+vendor_inventory
+
+-- Unique # of customers
+SELECT 
+DISTINCT 
+ customer_id
+ FROM 
+customer
+
+
+-- Answer:
+-- All combinations of products and customers
 SELECT product_id
 ,customer_id
 FROM 
 vendor_inventory
 CROSS JOIN 
 customer;
+
+
 
 -- INSERT
 /*1.  Create a new table "product_units". 
