@@ -2,7 +2,6 @@
 /* SECTION 2 */
 -----  Here are the requirements
 -- https://github.com/UofT-DSI/sql/blob/main/02_activities/assignments/Assignment1.md
--- https://github.com/UofT-DSI/sql/blob/main/02_activities/assignments/Assignment1_rubric.md
 
 --SELECT
 /* 1. Write a query that returns everything in the customer table. */
@@ -25,8 +24,6 @@ LIMIT 10
 --WHERE
 /* 1. Write a query that returns all customer purchases of product IDs 4 and 9. */
 -- option 1
--- Also apparently there aren't any records with product ID = 9
-
 SELECT *
 FROM customer_purchases as cust_p
 WHERE product_id = 4
@@ -60,6 +57,7 @@ SELECT *
 FROM customer_purchases 
 WHERE 
 vendor_id BETWEEN 8 and 10;
+
 
 
 --CASE
@@ -103,7 +101,6 @@ vendor_id field they both have in common, and sorts the result by vendor_name, t
 
 SELECT *
 FROM vendor_booth_assignments
--- I know you can give the table names an alias or abbreviated name
 INNER JOIN 
 vendor
 ON
@@ -148,7 +145,6 @@ LEFT JOIN customer c
 ON c.customer_id = 
 cust_p.customer_id
 
--- Picked this up from work
 GROUP BY 1,2,3,4
 HAVING Paid >= 2000
 
@@ -180,41 +176,22 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 
--- Temp table slides: https://github.com/UofT-DSI/sql/blob/main/01_materials/slides/slides_03.pdf   - Page 30
--- Apr 17th class
+-- Teno table: https://github.com/UofT-DSI/sql/blob/main/01_materials/slides/slides_03.pdf   - Page 30
 
--- Removes table is it already exists
--- If not removed, then it will cause an error
-DROP TABLE IF EXISTS temp.new_vendor;
 
--- Create the temp table
-CREATE TEMP TABLE temp.new_vendor
-AS 
--- best to state the columns and their order
-( 
-    SELECT 
-    vendor_id
-    ,vendor_name
-    ,vendor_type
-    ,vendor_owner_first_name
-    ,vendor_owner_last_name
-    FROM 
-    vendor  
-)
+CREATE TABLE temp.new_vendor (
+SELECT 
+vendor_id
+,vendor_name
+,vendor_type
+,vendor_owner_first_name
+,vendor_owner_last_name
+FROM 
+vendor )
 
--- Niyaz did a similar example during after class office hours
--- Thanks again Niyaz
-INSERT INTO 
-temp.new_vendor (    
-     vendor_id
-    ,vendor_name
-    ,vendor_type
-    ,vendor_owner_first_name
-    ,vendor_owner_last_name)
--- Assuming you want the ID to be 10; otherwise it can be another
--- random number
-VALUES(10, "Thomas's Superfood Store"
-, 'Fresh Focused' , 'Thomas' , 'Rosenthal') ;
+as temp.new_vendor
+
+INSERT 
 
 
 -- Date
@@ -222,8 +199,6 @@ VALUES(10, "Thomas's Superfood Store"
 
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! */
-
--- I believe Thomas said this part was optional	
 
 SELECT 
 customer_id
@@ -241,19 +216,14 @@ Remember that money spent is quantity*cost_to_customer_per_qty.
 HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement!! */
 
--- had to google this for the answer
+
 SELECT 
 customer_id
--- adding in a day field (wasn't asked)
 , strftime('%d', market_date ) as market_day
--- adding in a month field
 , strftime('%m', market_date ) as market_month
--- adding in a year field	
 , strftime('%Y', market_date ) as market_year
--- Normally would use YEAR() in MS SQL
 , market_date
---,(quantity * cost_to_customer_per_qty) as price 
--- assuming this what you looking for the amount of money spent	
+--,(quantity * cost_to_customer_per_qty) as price
 ,SUM (quantity * cost_to_customer_per_qty) as Paid
 FROM 
 customer_purchases
