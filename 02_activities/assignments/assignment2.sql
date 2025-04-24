@@ -218,7 +218,7 @@ CREATE TABLE product_units as
 
 SELECT 
     *
-    ,CURRENT_TIMESTAMP as snapshot_timestamp
+    ,DATETIME('now') as snapshot_timestamp
 FROM 
     product
 WHERE 
@@ -237,25 +237,49 @@ product_id
 ,product_qty_type
 , snapshot_timestamp
 )
-    SELECT 
-    product_id
-    ,product_name
-    ,product_size
-    ,product_category_id
-    ,product_qty_type
-    -- Gets the current date time / when the code was run
-    -- ,CURRENT_TIMESTAMP as  snapshot_timestamp
-    ,DATETIME('now') as  snapshot_timestamp
-    FROM product 
-WHERE 
-product_qty_type = 'unit'
-;
+
+VALUES (7, 'Apple Pie', '"10"', 3, 'unit', '2020-02-20')
+
+
+
+-- --- OLD Code > misunderstood question
+-- INSERT INTO 
+-- product_units (
+-- product_id
+-- ,product_name
+-- ,product_size
+-- ,product_category_id
+-- ,product_qty_type
+-- , snapshot_timestamp
+-- )
+--     SELECT 
+--     product_id
+--     ,product_name
+--     ,product_size
+--     ,product_category_id
+--     ,product_qty_type
+--     -- Gets the current date time / when the code was run
+--     -- ,CURRENT_TIMESTAMP as  snapshot_timestamp
+--     ,DATETIME('now') as  snapshot_timestamp
+--     FROM product 
+-- WHERE 
+-- product_qty_type = 'unit'
+-- ;
 
 -- DELETE
 /* 1. Delete the older record for the whatever product you added. 
 
 HINT: If you don't specify a WHERE clause, you are going to have a bad time.*/
 
+DELETE FROM product_units
+
+-- deleting the record I created because technically it is the older record by date
+WHERE 
+-- makes sure it has the right ID
+product_id = 7
+AND 
+-- Based on the date I artificially created
+snapshot_timestamp = '2020-02-20'
 
 
 -- UPDATE
@@ -275,3 +299,6 @@ Finally, make sure you have a WHERE statement to update the right row,
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
 
+
+ALTER TABLE product_units
+ADD current_quantity INT;
