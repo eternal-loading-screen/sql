@@ -3,6 +3,8 @@
 
 -- https://github.com/eternal-loading-screen/sql/blob/assignment-one/01_materials/slides/slides_04.pdf
 
+-- https://github.com/UofT-DSI/onboarding/blob/main/onboarding_documents/submissions.md
+
 /* SECTION 2 */
 
 -- COALESCE
@@ -211,19 +213,40 @@ This table will contain only products where the `product_qty_type = 'unit'`.
 It should use all of the columns from the product table, as well as a new column for the `CURRENT_TIMESTAMP`.  
 Name the timestamp column `snapshot_timestamp`. */
 
-INSERT INTO 
-product_units as (
-SELECT *
--- Gets the current time / when the code was run
-, now() as snapshot_timestamp
-FROM product 
+--assuming you want a new table
+CREATE TABLE product_units as
+
+SELECT 
+    *
+    ,CURRENT_TIMESTAMP as snapshot_timestamp
+FROM 
+    product
 WHERE 
-product_qty_type = 'unit')
+    product_qty_type = 'unit';
 
 /*2. Using `INSERT`, add a new row to the product_units table (with an updated timestamp). 
 This can be any product you desire (e.g. add another record for Apple Pie). */
 
-
+INSERT INTO 
+product_units (
+product_id
+,product_name
+,product_size
+,product_category_id
+,product_qty_type
+, snapshot_timestamp
+)
+    SELECT 
+    product_id
+    ,product_name
+    ,product_size
+    ,product_category_id
+    ,product_qty_type
+    -- Gets the current date time / when the code was run
+    ,DATETIME('now') as  snapshot_timestamp
+    FROM product 
+WHERE 
+product_qty_type = 'unit'
 
 -- DELETE
 /* 1. Delete the older record for the whatever product you added. 
