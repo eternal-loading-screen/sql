@@ -222,7 +222,8 @@ SELECT
 FROM 
     product
 WHERE 
-    product_qty_type = 'unit';
+    product_qty_type = 'unit'
+;
 
 /*2. Using `INSERT`, add a new row to the product_units table (with an updated timestamp). 
 This can be any product you desire (e.g. add another record for Apple Pie). */
@@ -243,10 +244,12 @@ product_id
     ,product_category_id
     ,product_qty_type
     -- Gets the current date time / when the code was run
+    -- ,CURRENT_TIMESTAMP as  snapshot_timestamp
     ,DATETIME('now') as  snapshot_timestamp
     FROM product 
 WHERE 
 product_qty_type = 'unit'
+;
 
 -- DELETE
 /* 1. Delete the older record for the whatever product you added. 
