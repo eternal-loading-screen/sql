@@ -148,22 +148,80 @@ with a UNION binding them. */
 
 -- Create a temp table
 -- Drop table if the code has already been run
-DROP TABLE IF EXISTS temp.daily_sales
-DROP TABLE IF EXISTS temp.max_sales
+-- Drop tables if they exist
+DROP TABLE IF EXISTS temp.daily_sales;
+DROP TABLE IF EXISTS temp.max_sales;
 DROP TABLE IF EXISTS temp.min_sales;
 
 -- Create the temp table
-CREATE TEMP TABLE temp.daily_sales
-AS 
-(
-SELECT
-market_date
-,SUM (quantity * cost_to_customer_per_qty) as Sales
-FROM 
-customer_purchases
-GROUP BY 1
-)
+CREATE TEMP TABLE temp.daily_sales AS 
+    SELECT
+    market_date
+    ,SUM(quantity * cost_to_customer_per_qty) AS Sales
+    ,RANK() OVER (ORDER BY SUM(quantity * cost_to_customer_per_qty) ASC) AS sales_min_rank
+    ,RANK() OVER (ORDER BY SUM(quantity * cost_to_customer_per_qty) DESC) AS sales_max_rank
+    FROM 
+        customer_purchases
+    GROUP BY 
+    market_date
+;
 
+-- Min Sales
+CREATE TEMP TABLE temp.min_sales AS 
+    SELECT 
+    *, 
+    RANK() OVER (ORDER BY sales ASC) AS sales_min_rank
+    FROM 
+    temp.daily_sales
+    WHERE sales_min_rank = 1
+;
+
+
+-- Max Sales
+CREATE TEMP TABLE temp.max_sales AS 
+    SELECT 
+    *, 
+    RANK() OVER (ORDER BY sales DESC) AS sales_max_rank
+    FROM 
+    temp.daily_sales
+    WHERE 
+    sales_max_rank = 1
+;
+
+-- Combine tables
+
+SELECT *
+FROM temp.min_sales
+
+UNION ALL 
+
+SELECT *
+FROM temp.max_sales
+
+
+-- More Efficient method but has no UNION
+
+DROP TABLE IF EXISTS temp.daily_sales;
+DROP TABLE IF EXISTS temp.max_sales;
+DROP TABLE IF EXISTS temp.min_sales;
+
+-- Create the temp table
+CREATE TEMP TABLE temp.daily_sales AS 
+    SELECT
+    market_date
+    ,SUM(quantity * cost_to_customer_per_qty) AS Sales
+    ,RANK() OVER (ORDER BY SUM(quantity * cost_to_customer_per_qty) ASC) AS sales_min_rank
+    ,RANK() OVER (ORDER BY SUM(quantity * cost_to_customer_per_qty) DESC) AS sales_max_rank
+    FROM 
+        customer_purchases
+    GROUP BY 
+    market_date
+;
+
+SELECT *
+from temp.daily_sales
+WHERE sales_min_rank = 1
+or sales_max_rank = 1
 
 
 -------------------------------------------------------------------------------
