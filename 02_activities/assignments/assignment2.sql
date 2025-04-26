@@ -36,7 +36,7 @@ WHERE details is not null
 SELECT 
  COALESCE( (product_name || ', ' || product_size|| ' (' || product_qty_type || ')' ), 'Missing data') as details
 FROM product
---Optional
+-- Optional filter
 -- WHERE details <> 'Missing data'
 
 
@@ -258,7 +258,7 @@ DISTINCT
  FROM 
 customer
 
--- Sum up revenue and rows = 8 * 26 = 208
+-- Sum up revenue, and rendor rows = 8 * 26 = 208
 
 SELECT 
 vendor_id
@@ -293,8 +293,11 @@ FROM (
     FROM 
     vendor_inventory
     CROSS JOIN 
-    customer;
+    customer
 ) as r
+-- Using LEFT JOIN because if for whatever reason the record does not exist on 
+-- the product or vendor table, we do not "filter" the data out
+-- basically not hide the bad data
 LEFT JOIN product p
 ON p.product_id = r.product_id
 
@@ -362,6 +365,8 @@ VALUES (7, 'Apple Pie', '"10"', 3, 'unit', '2020-02-20')
 -- product_qty_type = 'unit'
 -- ;
 
+
+
 -- DELETE
 /* 1. Delete the older record for the whatever product you added. 
 
@@ -379,6 +384,8 @@ AND
 -- Based on the date I artificially created
 -- But if we had to remove the other record, we would filter by the snapshot_timestamp = whenever the code was run
 snapshot_timestamp = '2020-02-20' ;
+
+
 
 
 -- UPDATE
@@ -425,8 +432,9 @@ counter = 1
 -- Second, coalesce null values to 0 (if you don't have null values, figure out how to rearrange your query so you do.) 
 -- I guess we have to coalesce in case people don't have sales?
 
-SELECT *
-,COALESCE( quantity, 0 ) as current_quantity
+-- Assuming that since the field was newly created, and presumably null we want to populate it with 0
+SELECT 
+COALESCE( quantity, 0 ) as current_quantity
 FROM 
 (
     -- Subquery that sorts the data and applys a counter
@@ -437,20 +445,47 @@ FROM
     ORDER BY market_date  DESC ) as counter
     FROM 
     vendor_inventory
-)
+) ref_table
 WHERE 
 counter = 1
 
 
 -- Part D)
 -- Third, SET current_quantity = (...your select statement...), remembering that WHERE can only accommodate one column. 
+-- Assuming you are trying to take the data from the vendor inventory table and "append" it to the product_unit table
 
 UPDATE product_units
 SET current_quantity
-= 10
-WHERE current_quantity = 0 
+= 
+-- assuming we want to take the data from product_inventory to update product_units
+    (SELECT 
+    -- We need to limit the output to 1 field
+    COALESCE( quantity, 0 ) as current_quantity
+    FROM 
+    (
+        -- Subquery that sorts the data and applys a counter
+        -- then filters the data
+        -- during office hours: looking for the latest transaction
+        SELECT *
+        ,ROW_NUMBER() OVER( PARTITION BY  vendor_id, product_id
+        ORDER BY market_date  DESC ) as counter
+        FROM 
+        vendor_inventory
+    ) ref_table
+    WHERE 
+    counter = 1)
+
+WHERE current_quantity is null 
 
 
+
+--- OLD Code
+-- Initially assumed you wanted to set the current_quantity field to equal another field
+
+-- UPDATE product_units
+-- SET current_quantity
+-- = 10
+-- WHERE current_quantity = 0 
 
 
 
