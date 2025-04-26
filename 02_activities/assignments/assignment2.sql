@@ -166,7 +166,9 @@ GROUP BY 1
 
 
 
-
+-------------------------------------------------------------------------------
+---------------------
+---------------------
 /* SECTION 3 */
 
 -- Cross Join
@@ -180,30 +182,65 @@ Think a bit about the row counts: how many distinct vendors, product names are t
 How many customers are there (y). 
 Before your final group by you should have the product of those two queries (x*y).  */
 
-
--- Unique # of Vendors
+-- Apparently looking for 5 * rows
+-- Unique # of Vendors - 8 
 SELECT 
 DISTINCT 
  product_id
+ ,vendor_id
+ ,original_price
  FROM 
 vendor_inventory
 
--- Unique # of customers
+-- Unique # of customers - 26
 SELECT 
 DISTINCT 
  customer_id
  FROM 
 customer
 
+-- Sum up revenue and rows = 8 * 26 = 208
+
+SELECT 
+vendor_id
+,product_id
+,sum( original_price * quantity ) as revenue
+ FROM 
+vendor_inventory
+GROUP BY 
+vendor_id
+,product_id
+
 
 -- Answer:
 -- All combinations of products and customers
-SELECT product_id
-,customer_id
-FROM 
-vendor_inventory
-CROSS JOIN 
-customer;
+
+SELECT 
+p.product_name
+,v.vendor_id
+,original_price
+,revenue
+
+FROM (
+
+    SELECT 
+    DISTINCT
+    product_id
+    ,vendor_id
+    ,original_price
+    -- Assuming quantity is 5
+    ,original_price * 5 as revenue
+    ,customer_id
+    FROM 
+    vendor_inventory
+    CROSS JOIN 
+    customer;
+) as r
+LEFT JOIN product p
+ON p.product_id = r.product_id
+
+LEFT JOIN vendor v
+ON v.vendor_ID = r.vendor_id ;
 
 
 
@@ -235,7 +272,7 @@ product_id
 ,product_size
 ,product_category_id
 ,product_qty_type
-, snapshot_timestamp
+,snapshot_timestamp
 )
 
 VALUES (7, 'Apple Pie', '"10"', 3, 'unit', '2020-02-20')
@@ -271,6 +308,8 @@ VALUES (7, 'Apple Pie', '"10"', 3, 'unit', '2020-02-20')
 
 HINT: If you don't specify a WHERE clause, you are going to have a bad time.*/
 
+
+-- Specifying the table
 DELETE FROM product_units
 
 -- deleting the record I created because technically it is the older record by date
@@ -279,7 +318,8 @@ WHERE
 product_id = 7
 AND 
 -- Based on the date I artificially created
-snapshot_timestamp = '2020-02-20'
+-- But if we had to remove the other record, we would filter by the snapshot_timestamp = whenever the code was run
+snapshot_timestamp = '2020-02-20' ;
 
 
 -- UPDATE
@@ -299,6 +339,68 @@ Finally, make sure you have a WHERE statement to update the right row,
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
 
-
+-- Part A)
 ALTER TABLE product_units
 ADD current_quantity INT;
+
+-- Part B)
+-- Find the quantity
+
+SELECT *
+FROM 
+vendor_inventory
+
+
+-- Finds the last quantity per product
+SELECT *
+FROM 
+(
+    -- Subquery that sorts the data and applys a counter
+    -- then filters the data
+    -- during office hours: looking for the latest transaction
+    SELECT *
+    ,ROW_NUMBER() OVER( PARTITION BY  vendor_id, product_id
+    ORDER BY market_date  DESC ) as counter
+    FROM 
+    vendor_inventory
+)
+WHERE 
+counter = 1
+
+-- Part C)
+-- Second, coalesce null values to 0 (if you don't have null values, figure out how to rearrange your query so you do.) 
+-- I guess we have to coalesce in case people don't have 
+
+
+------ DIfferent section
+
+UPDATE product_units
+SET current_quantity
+= 
+-- Query from part D)
+
+
+
+--- OLD CODE
+-- Need to look for a number in product size, but ignore inches or "
+
+    -- SELECT 
+    -- product_id
+    -- ,product_name
+    -- ,product_size
+    -- ,product_category_id
+    -- ,product_qty_type
+    -- ,INSTR( product_size ,'"') as double_quote_finder
+    -- ,product_size  REGEXP '[0-9]'  as number_finder
+    -- ,product_size  REGEXP '[^0-9]' AS non_number_finder
+    -- FROM product 
+
+
+
+-- SELECT 
+-- product_id
+-- ,quantity
+-- ,max(market_date)
+-- FROM 
+-- vendor_inventory
+-- GROUP BY 1,2
