@@ -412,6 +412,7 @@ ADD current_quantity INT;
 -- Part B)
 -- Find the quantity
 
+-- Hint: First, determine how to get the "last" quantity per product. 
 -- Finds the last quantity per product
 SELECT *
 FROM 
@@ -429,7 +430,7 @@ WHERE
 counter = 1
 
 -- Part C)
--- Second, coalesce null values to 0 (if you don't have null values, figure out how to rearrange your query so you do.) 
+-- Hint: Second, coalesce null values to 0 (if you don't have null values, figure out how to rearrange your query so you do.) 
 -- I guess we have to coalesce in case people don't have sales?
 
 -- Assuming that since the field was newly created, and presumably null we want to populate it with 0
@@ -477,10 +478,36 @@ SET current_quantity
 
 WHERE current_quantity is null 
 
+--- All together in 1 section
 
+ALTER TABLE product_units
+ADD current_quantity INT;
+
+UPDATE product_units
+SET current_quantity
+= 
+-- assuming we want to take the data from product_inventory to update product_units
+    (SELECT 
+    -- We need to limit the output to 1 field
+    COALESCE( quantity, 0 ) as current_quantity
+    FROM 
+    (
+        -- Subquery that sorts the data and applys a counter
+        -- then filters the data
+        -- during office hours: looking for the latest transaction
+        SELECT *
+        ,ROW_NUMBER() OVER( PARTITION BY  vendor_id, product_id
+        ORDER BY market_date  DESC ) as counter
+        FROM 
+        vendor_inventory
+    ) ref_table
+    WHERE 
+    counter = 1)
+
+WHERE current_quantity is null 
 
 --- OLD Code
--- Initially assumed you wanted to set the current_quantity field to equal another field
+-- Initially assumed you wanted to set the current_quantity field to equal another random value
 
 -- UPDATE product_units
 -- SET current_quantity
