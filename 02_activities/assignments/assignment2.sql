@@ -202,6 +202,7 @@ FROM temp.max_sales
 -- More Efficient method but has no UNION
 
 DROP TABLE IF EXISTS temp.daily_sales;
+-- Can remove these 2 drop tables - was used in the UNION version of code
 DROP TABLE IF EXISTS temp.max_sales;
 DROP TABLE IF EXISTS temp.min_sales;
 
@@ -404,11 +405,6 @@ ADD current_quantity INT;
 -- Part B)
 -- Find the quantity
 
-SELECT *
-FROM 
-vendor_inventory
-
-
 -- Finds the last quantity per product
 SELECT *
 FROM 
@@ -427,18 +423,39 @@ counter = 1
 
 -- Part C)
 -- Second, coalesce null values to 0 (if you don't have null values, figure out how to rearrange your query so you do.) 
--- I guess we have to coalesce in case people don't have 
+-- I guess we have to coalesce in case people don't have sales?
+
+SELECT *
+,COALESCE( quantity, 0 ) as current_quantity
+FROM 
+(
+    -- Subquery that sorts the data and applys a counter
+    -- then filters the data
+    -- during office hours: looking for the latest transaction
+    SELECT *
+    ,ROW_NUMBER() OVER( PARTITION BY  vendor_id, product_id
+    ORDER BY market_date  DESC ) as counter
+    FROM 
+    vendor_inventory
+)
+WHERE 
+counter = 1
 
 
------- DIfferent section
+-- Part D)
+-- Third, SET current_quantity = (...your select statement...), remembering that WHERE can only accommodate one column. 
 
 UPDATE product_units
 SET current_quantity
-= 
--- Query from part D)
+= 10
+WHERE current_quantity = 0 
 
 
 
+
+
+
+---------------------------------------
 --- OLD CODE
 -- Need to look for a number in product size, but ignore inches or "
 
