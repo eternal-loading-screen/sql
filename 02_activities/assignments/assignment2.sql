@@ -249,14 +249,14 @@ DISTINCT
  ,vendor_id
  ,original_price
  FROM 
-vendor_inventory
+vendor_inventory;
 
 -- Unique # of customers - 26
 SELECT 
 DISTINCT 
  customer_id
  FROM 
-customer
+customer;
 
 -- Sum up revenue, and rendor rows = 8 * 26 = 208
 
@@ -277,6 +277,7 @@ vendor_id
 SELECT 
 p.product_name
 ,v.vendor_id
+,v.vendor_name
 ,original_price
 ,revenue
 
@@ -303,7 +304,6 @@ ON p.product_id = r.product_id
 
 LEFT JOIN vendor v
 ON v.vendor_ID = r.vendor_id ;
-
 
 
 -- INSERT
@@ -405,6 +405,8 @@ Finally, make sure you have a WHERE statement to update the right row,
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
 
+-- During Saturday's office hours, what was important was that we attempt this question and show our work: ¯\_(ツ)_/¯
+
 -- Part A)
 ALTER TABLE product_units
 ADD current_quantity INT;
@@ -478,6 +480,7 @@ SET current_quantity
 
 WHERE current_quantity is null 
 
+
 --- All together in 1 section
 
 ALTER TABLE product_units
@@ -505,6 +508,8 @@ SET current_quantity
     counter = 1)
 
 WHERE current_quantity is null 
+
+
 
 --- OLD Code
 -- Initially assumed you wanted to set the current_quantity field to equal another random value
