@@ -50,6 +50,16 @@ each new market date for each customer, or select only the unique market dates p
 (without purchase details) and number those visits. 
 HINT: One of these approaches uses ROW_NUMBER() and one uses DENSE_RANK(). */
 
+-- NEW ANSWER
+
+SELECT *
+,ROW_NUMBER() OVER( PARTITION BY  customer_id 
+ORDER BY market_date , transaction_time ASC ) as counter
+FROM 
+customer_purchases	
+	
+
+-- OLD ANSWER	
 SELECT *
 ,ROW_NUMBER() OVER( PARTITION BY  market_date, customer_id 
 ORDER BY market_date , transaction_time ASC ) as counter
