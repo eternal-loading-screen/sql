@@ -54,7 +54,18 @@ The store wants to keep customer addresses. Propose two architectures for the CU
 **HINT:** search type 1 vs type 2 slowly changing dimensions. 
 
 ```
-Your answer...
+Also on diagram:
+
+"TYPE 1:
+This version will only retain the latest address for the customer. Meaning we cannot see how the customer may be moving, and the ability to send / deliver books to different mailing addresses.
+
+TYPE 2:
+This version retains more data on the customer's addresss.This version can provide historical context (that is why there is a date field) on the customer's address, and potentially the ability to deliver books to different addresses (for example). 
+
+The downside with the approach is that it would be harder to parse their current address, which is why I added a ""Is_Current_Address"" boolean field."
+![image](https://github.com/user-attachments/assets/ea9def5e-f2eb-4c35-9613-a33380bc6ca4)
+
+
 ```
 
 ***
